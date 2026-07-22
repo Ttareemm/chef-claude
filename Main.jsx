@@ -1,10 +1,11 @@
 import React from "react"
 import IngredientsList from "./components/IngredientsList"
 import ClaudeRecipe from "./components/ClaudeRecipe"
-import { getRecipeFromChefClaude } from "./ai"
+import { getRecipeFromMistral } from "./ai"
 
 export default function Main() {
     const [ingredients, setIngredients] = React.useState([])
+
     const [recipe, setRecipe] = React.useState("")
     const [isLoading, setIsLoading] = React.useState(false)
 
@@ -12,8 +13,7 @@ export default function Main() {
         try {
             setIsLoading(true)
 
-            const recipeMarkdown =
-                await getRecipeFromChefClaude(ingredients)
+            const recipeMarkdown = await getRecipeFromMistral(ingredients)
 
             setRecipe(recipeMarkdown)
         } catch (error) {
@@ -38,10 +38,7 @@ export default function Main() {
 
     return (
         <main>
-            <form
-                action={addIngredient}
-                className="add-ingredient-form"
-            >
+            <form action={addIngredient} className="add-ingredient-form">
                 <input
                     type="text"
                     placeholder="e.g. oregano"
@@ -49,23 +46,20 @@ export default function Main() {
                     name="ingredient"
                 />
 
-                <button type="submit">
-                    Add ingredient
-                </button>
+                <button>Add ingredient</button>
             </form>
 
             {ingredients.length > 0 && (
                 <IngredientsList
                     ingredients={ingredients}
                     getRecipe={getRecipe}
+                    isLoading={isLoading}
                 />
             )}
 
             {isLoading && <p>Generating recipe...</p>}
 
-            {recipe && (
-                <ClaudeRecipe recipe={recipe} />
-            )}
+            {recipe && <ClaudeRecipe recipe={recipe} />}
         </main>
     )
 }
